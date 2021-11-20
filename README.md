@@ -31,3 +31,11 @@ Cuando las coordenadas del personaje coincidan con la parte superior o inferior 
 rectangulo (obstaculos) el juego concluirá. El contador dejara de incrementarse, y si supero su record previo, se guardara
 en el localStorage.
 El personaje volvera a su posicion inicial, y el juego estara listo para comenzar de nuevo.
+
+### Actualizacion 20/11/21
+
+- Tamano de canvas 600 x 400
+- Experimentando con el personaje:
+  a) instancia de la clase Character
+  b) coordenadas, tamanio y peso en etapa de prueba
+  c) Eventos keydown/keyup lo mueven verticalmente

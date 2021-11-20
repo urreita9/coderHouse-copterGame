@@ -3,8 +3,8 @@ const canvas = document.getElementById('copter');
 const ctx = canvas.getContext('2d');
 
 // EL CANVAS OCUPARA TODA LA PANTALLA (en etapa de desarrollo)
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 600;
+canvas.height = 400;
 
 // POR EL MOMENTO ESCUCHAREMOS AL EVENTO CLICK
 // Y GUARDAREMOS SUS COORDENADAS EN UN OBJETO
@@ -13,6 +13,8 @@ const click = {
 	x: null,
 	y: null,
 };
+
+let space = false;
 
 document.addEventListener('click', (event) => {
 	click.x = event.x;
@@ -75,12 +77,13 @@ const handleSmoke = () => {
 	}
 	// RECORDATORIO: ELIMINAR BURBUJAS Y VACIAR ARRAY
 };
-
 // funcion importantisima. Limpia el canvas mediante clearRect(coord x inicial, coord y inicial, hasta donde en x, hasta donde en y), ejecuta
 // la actualizacion/dibujo y finalmente se vuelve a llamar una y otra vez mediante requestAnimationFrame.
 const animate = () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+	character.update();
+	character.draw();
 	handleSmoke();
 
 	requestAnimationFrame(animate);
