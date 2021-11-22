@@ -9,22 +9,30 @@ canvas.height = 400;
 // POR EL MOMENTO ESCUCHAREMOS AL EVENTO CLICK
 // Y GUARDAREMOS SUS COORDENADAS EN UN OBJETO
 
-const click = {
-	x: null,
-	y: null,
-};
+// const click = {
+// 	x: null,
+// 	y: null,
+// };
 
+// Guardamos como boolean si la tecla space esta siendo presionada o no
 let space = false;
 
-document.addEventListener('click', (event) => {
-	click.x = event.x;
-	click.y = event.y;
+// Necesitamos una variable que nos sirva para establecer un intervalo
+// para la aparicion de los obstaculos
 
-	//Con cada click agregamos 10 burbujas al array smokeTrail
-	for (let i = 0; i < 10; i++) {
-		smokeTrail.push(new Bubble());
-	}
-});
+let interval = 0;
+
+let difficult = 2;
+
+// document.addEventListener('click', (event) => {
+// 	click.x = event.x;
+// 	click.y = event.y;
+
+// 	//Con cada click agregamos 10 burbujas al array smokeTrail
+// 	for (let i = 0; i < 10; i++) {
+// 		smokeTrail.push(new Bubble());
+// 	}
+// });
 
 // Array vacio para almacenar las burbujas
 
@@ -34,11 +42,13 @@ const smokeTrail = [];
 
 class Bubble {
 	constructor() {
-		// coordenadas iniciales
-		this.x = click.x;
-		this.y = click.y;
+		// coordenadas iniciales. Las mismas seran las del personaje.
+		// coord x le restamos 3 px para dejar un espacio entre el humo y el personaje
+		this.x = character.x - 3;
+		//coord y le sumamos la mitad del lado del personaje para que el humo salga del centro del mismo
+		this.y = character.y + character.size / 2;
 		// tamano random
-		this.size = Math.random() * 5 + 1;
+		this.size = Math.random() * 3 + 1;
 		// movimiento x negativo
 		this.movX = Math.random() * 3 * -1;
 		// movimiento y random
@@ -69,13 +79,20 @@ class Bubble {
 
 // funcion para manejar las actualizaciones y el dibujo del humo
 const handleSmoke = () => {
-	// recorremos el arreglo que rellenamos con el click
+	//agregamos burbujas al array smokeTrail
+	smokeTrail.unshift(new Bubble());
+	// recorremos el array
 	for (let i = 0; i < smokeTrail.length; i++) {
 		//actualizamos y dibujamos cada burbuja
 		smokeTrail[i].update();
 		smokeTrail[i].draw();
 	}
-	// RECORDATORIO: ELIMINAR BURBUJAS Y VACIAR ARRAY
+	// NO DEJAMOS QUE EL ARRAY TENGA MAS DE 100 ELEMENTOS. CUANDO LO HACE, LE SACAMOS 20.
+	if (smokeTrail.length > 100) {
+		for (let i = 0; i < 20; i++) {
+			smokeTrail.pop(smokeTrail[i]);
+		}
+	}
 };
 // funcion importantisima. Limpia el canvas mediante clearRect(coord x inicial, coord y inicial, hasta donde en x, hasta donde en y), ejecuta
 // la actualizacion/dibujo y finalmente se vuelve a llamar una y otra vez mediante requestAnimationFrame.
@@ -85,7 +102,9 @@ const animate = () => {
 	character.update();
 	character.draw();
 	handleSmoke();
+	interval++;
 
+	handleRectangles();
 	requestAnimationFrame(animate);
 };
 animate();
