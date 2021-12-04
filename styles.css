@@ -7,4 +7,6 @@ body {
 
 #copter {
 	border: 2px solid white;
+	display: block;
+	margin: 0 auto;
 }

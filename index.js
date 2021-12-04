@@ -1,7 +1,7 @@
 // ACCEDEMOS AL NODO Y SUS PROPIEDADES/METODOS mediante getContext() en 2d
 const canvas = document.getElementById('copter');
 const ctx = canvas.getContext('2d');
-
+const btn = document.getElementById('play');
 // EL CANVAS OCUPARA TODA LA PANTALLA (en etapa de desarrollo)
 canvas.width = 600;
 canvas.height = 400;
@@ -14,8 +14,39 @@ canvas.height = 400;
 // 	y: null,
 // };
 
+//GAMESTATE (to be changed)
+// let play = false;
+// canvas.addEventListener('click', () => handleState());
+// let gameState = {
+// 	current: 0,
+// 	ready: 0,
+// 	gameOver: 1,
+// };
+// const handleState = () => {
+// 	if (gameState.current === gameState.ready) {
+// 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+// 		play = true;
+// 		animate();
+// 	}
+// 	// if (gameState.current === gameState.gameOver) {
+// 	// 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
+// 	// 	gameState.current = gameState.ready;
+// 	// }
+// };
+
 // Guardamos como boolean si la tecla space esta siendo presionada o no
 let space = false;
+document.addEventListener('keydown', (event) => {
+	if (event.code === 'Space') {
+		space = true;
+	}
+});
+
+document.addEventListener('keyup', (event) => {
+	if (event.code === 'Space') {
+		space = false;
+	}
+});
 
 // Necesitamos una variable que nos sirva para establecer un intervalo
 // para la aparicion de los obstaculos
@@ -23,7 +54,11 @@ let space = false;
 let interval = 0;
 
 let difficult = 2;
+const collision = new Image();
+collision.src = './images/collision1.png';
 
+const plane = new Image();
+plane.src = './images/plane.png';
 // document.addEventListener('click', (event) => {
 // 	click.x = event.x;
 // 	click.y = event.y;
@@ -34,64 +69,22 @@ let difficult = 2;
 // 	}
 // });
 
-// Array vacio para almacenar las burbujas
-
-const smokeTrail = [];
-
-// CLASE BUBBLE, NOS DARA LUGAR PARA INSTANCIAR LAS BURBUJAS DE smokeTrail CON EL EVENTO CLICK
-
-class Bubble {
-	constructor() {
-		// coordenadas iniciales. Las mismas seran las del personaje.
-		// coord x le restamos 3 px para dejar un espacio entre el humo y el personaje
-		this.x = character.x - 3;
-		//coord y le sumamos la mitad del lado del personaje para que el humo salga del centro del mismo
-		this.y = character.y + character.size / 2;
-		// tamano random
-		this.size = Math.random() * 3 + 1;
-		// movimiento x negativo
-		this.movX = Math.random() * 3 * -1;
-		// movimiento y random
-		this.movY = Math.random() * 3 - 1.5;
-	}
-	// metodo para actualizar el movimiento y la posicion
-	update() {
-		//decrementamos x sumando el numero negativo de movX
-		this.x += this.movX;
-		// modificamos y
-		this.y += this.movY;
-		// vamos achicando las burbujas a medida que se desplazan
-		if (this.size > 0.3) this.size -= 0.1;
-	}
-	// metodo para dibujar
-	draw() {
-		// Asi se dibuja un cirulo en canvas
-		// por el momento las burbujas seran rojas
-		ctx.fillStyle = 'red';
-		//Declaramos el principio del trazo
-		ctx.beginPath();
-		// generamos un circulo arc(coord x, coord y, radio, eje principio de trazo, circunferencia)
-		ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-		// rellenamos el circulo de rojo
-		ctx.fill();
-	}
-}
-
-// funcion para manejar las actualizaciones y el dibujo del humo
-const handleSmoke = () => {
-	//agregamos burbujas al array smokeTrail
-	smokeTrail.unshift(new Bubble());
-	// recorremos el array
-	for (let i = 0; i < smokeTrail.length; i++) {
-		//actualizamos y dibujamos cada burbuja
-		smokeTrail[i].update();
-		smokeTrail[i].draw();
-	}
-	// NO DEJAMOS QUE EL ARRAY TENGA MAS DE 100 ELEMENTOS. CUANDO LO HACE, LE SACAMOS 20.
-	if (smokeTrail.length > 100) {
-		for (let i = 0; i < 20; i++) {
-			smokeTrail.pop(smokeTrail[i]);
+const handleCollision = () => {
+	for (let i = 0; i < rectanglesArray.length; i++) {
+		if (
+			(character.x + character.size > rectanglesArray[i].x &&
+				character.x < rectanglesArray[i].x + rectanglesArray[i].width &&
+				character.y < rectanglesArray[i].y + rectanglesArray[i].height &&
+				character.y + character.size > rectanglesArray[i].y) ||
+			(character.x + character.size > rectanglesArray[i].x &&
+				character.x < rectanglesArray[i].x + rectanglesArray[i].width &&
+				character.y < rectanglesArray[i].bottom + rectanglesArray[i].height &&
+				character.y + character.size > rectanglesArray[i].bottom)
+		) {
+			ctx.drawImage(collision, character.x + 10, character.y - 10, 40, 40);
+			return true;
 		}
+		// COLLISION BOTTOM
 	}
 };
 // funcion importantisima. Limpia el canvas mediante clearRect(coord x inicial, coord y inicial, hasta donde en x, hasta donde en y), ejecuta
@@ -99,12 +92,23 @@ const handleSmoke = () => {
 const animate = () => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	character.update();
-	character.draw();
-	handleSmoke();
-	interval++;
+	if (play) {
+		handleRectangles();
 
-	handleRectangles();
+		character.update();
+		character.draw();
+		handleSmoke();
+		handleCollision();
+		if (handleCollision()) {
+			interval = 0;
+			// gameState.current = gameState.gameOver;
+			console.log(gameState);
+			play = false;
+			return;
+		}
+
+		interval++;
+	}
 	requestAnimationFrame(animate);
 };
 animate();

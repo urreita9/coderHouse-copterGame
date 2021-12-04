@@ -3,7 +3,8 @@ class Character {
 	constructor() {
 		this.x = 50;
 		this.y = 300;
-		this.size = 20;
+		this.size = 30;
+
 		this.movY = 0;
 		this.weight = 1;
 	}
@@ -33,8 +34,9 @@ class Character {
 		if (space) this.up();
 	}
 	draw() {
-		ctx.fillStyle = 'blue';
-		ctx.fillRect(this.x, this.y, this.size, this.size);
+		// ctx.fillStyle = 'blue';
+		// ctx.fillRect(this.x, this.y, this.size, this.size);
+		ctx.drawImage(plane, this.x, this.y, this.size, this.size);
 	}
 
 	// metodo que hace subir el personaje en el eje y
@@ -44,15 +46,3 @@ class Character {
 }
 
 const character = new Character();
-
-document.addEventListener('keydown', (event) => {
-	if (event.code === 'Space') {
-		space = true;
-	}
-});
-
-document.addEventListener('keyup', (event) => {
-	if (event.code === 'Space') {
-		space = false;
-	}
-});
